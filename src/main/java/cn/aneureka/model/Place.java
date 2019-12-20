@@ -10,8 +10,8 @@ public class Place extends Node {
     public Place() {
     }
 
-    public Place(String id, String name) {
-        super(id, name);
+    public Place(String id) {
+        super(id);
     }
 
     @Override

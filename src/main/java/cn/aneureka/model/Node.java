@@ -11,14 +11,11 @@ public class Node {
 
     protected String id;
 
-    protected String name;
-
     public Node() {
     }
 
-    public Node(String id, String name) {
+    public Node(String id) {
         this.id = id;
-        this.name = name;
     }
 
     @Override
@@ -30,12 +27,12 @@ public class Node {
             return false;
         }
         Node node = (Node) object;
-        return id.equals(node.id) && name.equals(node.name);
+        return id.equals(node.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(id);
     }
 
     public String getId() {
@@ -46,12 +43,5 @@ public class Node {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }
 

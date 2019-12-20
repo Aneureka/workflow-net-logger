@@ -10,8 +10,8 @@ public class Transition extends Node {
     public Transition() {
     }
 
-    public Transition(String id, String name) {
-        super(id, name);
+    public Transition(String id) {
+        super(id);
     }
 
     @Override
