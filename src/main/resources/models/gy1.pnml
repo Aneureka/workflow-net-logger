@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<pnml><net>
+    <place id="a"> <name> <text>p8</text></name> </place>
+    <place id="b"> <name> <text>p7</text></name> </place>
+    <place id="c"> <name> <text>p4</text></name> </place>
+    <place id="d"> <name> <text>p3</text></name> </place>
+    <transition id="A"><name> <text>1</text></name> </transition>
+    <transition id="B"><name> <text>2</text></name> </transition>
+    <transition id="C"><name> <text>3</text></name> </transition>
+    <transition id="D"><name> <text>4</text></name> </transition>
+    <transition id="E"><name> <text>5</text></name> </transition>
+
+    <arc source="a" target="A"> </arc>
+    <arc source="A" target="b"> </arc>
+    <arc source="b" target="B"> </arc>
+    <arc source="b" target="C"> </arc>
+    <arc source="C" target="c"> </arc>
+    <arc source="B" target="c"> </arc>
+    <arc source="c" target="D"> </arc>
+    <arc source="D" target="b"> </arc>
+    <arc source="c" target="E"> </arc>
+    <arc source="E" target="d"> </arc>
+
+</net></pnml>
