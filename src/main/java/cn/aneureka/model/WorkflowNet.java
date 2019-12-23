@@ -1,7 +1,8 @@
 package cn.aneureka.model;
 
-import com.sun.deploy.util.StringUtils;
-
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,7 +57,7 @@ public class WorkflowNet {
 
     public void init() {
         // find the in and out place
-        for (Node node: nodes) {
+        for (Node node : nodes) {
             if (node instanceof Place) {
                 if (inDegreeOf(this.graph, node) == 0) {
                     this.in = node;
@@ -72,14 +73,14 @@ public class WorkflowNet {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[Node]").append("\n");
-        for (Node node: nodes) {
+        for (Node node : nodes) {
             sb.append(node.toString()).append(" ");
         }
         sb.append("\n").append("[Graph]");
-        for (Map.Entry<Node, List<Node>> entry: graph.entrySet()) {
+        for (Map.Entry<Node, List<Node>> entry : graph.entrySet()) {
             sb.append("\n");
             sb.append(entry.getKey().toString()).append(" => ");
-            sb.append(StringUtils.join(entry.getValue().stream().map(Object::toString).collect(Collectors.toList()), " "));
+            sb.append(String.join(" ", entry.getValue().stream().map(Object::toString).collect(Collectors.toList())));
         }
         sb.append("\n");
         return sb.toString();
@@ -88,13 +89,21 @@ public class WorkflowNet {
     /**
      * Collects and prints the logs of graph.
      */
-    public void getLogOfGraph() {
-        List<List<Node>> res = new ArrayList<>();
+    public void getLogOfGraph(String logFile) {
+        List<List<Node>> logs = new ArrayList<>();
         List<Node> curNodes = new ArrayList<>();
         curNodes.add(this.in);
-        getLogOfGraph(this.graph, this.out, curNodes, new HashSet<>(), new ArrayList<>(), res);
-        res = filterLogs(res);
-        printLogs(res);
+        getLogOfGraph(this.graph, this.out, curNodes, new HashSet<>(), new ArrayList<>(), logs);
+        logs = filterLogs(logs);
+        if (logFile == null) {
+            printLogs(logs);
+        } else {
+            try {
+                printLogsToFile(logs, logFile);
+            } catch (IOException e) {
+                System.err.println("logFile is invalid");
+            }
+        }
     }
 
     /**
@@ -118,7 +127,7 @@ public class WorkflowNet {
             curNodes.remove(curNodeIndex);
             Map<Node, List<Node>> tmpGraph = copyOfGraph(graph);
             if (curNode instanceof Place) {
-                for (Node v: graph.get(curNode)) {
+                for (Node v : graph.get(curNode)) {
                     if (outDegreeOf(tmpGraph, v) > 0 || v.equals(exit)) {
                         curNodes.add(v);
                         getLogOfGraph(tmpGraph, exit, curNodes, entries, path, res);
@@ -128,7 +137,7 @@ public class WorkflowNet {
             } else {
                 List<Node> neighbors = graph.get(curNode);
                 Set<Node> tmpEntries = new HashSet<>(entries);
-                for (Node v: neighbors) {
+                for (Node v : neighbors) {
                     if (inDegreeOf(graph, v) > 1 && v instanceof Place) {
                         if (entries.contains(v)) {
                             removeEdge(tmpGraph, curNode, v);
@@ -157,10 +166,22 @@ public class WorkflowNet {
     }
 
     private static void printLogs(List<List<Node>> logs) {
-        for (List<Node> log: logs) {
-            System.out.println(log.stream().map(Node::toString).collect(Collectors.joining(" -> ")));
+        System.out.println(getLogsText(logs));
+    }
+
+    private static void printLogsToFile(List<List<Node>> logs, String logFile) throws IOException {
+        FileWriter fw = new FileWriter(new File(logFile));
+        fw.append(getLogsText(logs));
+        fw.close();
+    }
+
+    private static String getLogsText(List<List<Node>> logs) {
+        StringBuilder sb = new StringBuilder();
+        for (List<Node> log : logs) {
+            sb.append(log.stream().map(Node::toString).collect(Collectors.joining(" -> "))).append("\n");
         }
-        System.out.println(String.format("=== %d ===", logs.size()));
+        sb.append(String.format("=== All logs fetched: %d ===", logs.size())).append("\n");
+        return sb.toString();
     }
 
     /**
@@ -168,7 +189,7 @@ public class WorkflowNet {
      */
     private static int inDegreeOf(Map<Node, List<Node>> graph, Node node) {
         int res = 0;
-        for (Map.Entry<Node, List<Node>> entry: graph.entrySet()) {
+        for (Map.Entry<Node, List<Node>> entry : graph.entrySet()) {
             if (entry.getValue().contains(node)) {
                 res++;
             }
@@ -230,7 +251,7 @@ public class WorkflowNet {
         }
         visited.add(cur);
         boolean res = false;
-        for (Node v: graph.get(cur)) {
+        for (Node v : graph.get(cur)) {
             res = res || isAccessible(graph, v, target, visited);
         }
         return res;
@@ -242,7 +263,7 @@ public class WorkflowNet {
      */
     private static Map<Node, List<Node>> copyOfGraph(Map<Node, List<Node>> graph) {
         Map<Node, List<Node>> copied = new HashMap<>();
-        for (Map.Entry<Node, List<Node>> entry: graph.entrySet()) {
+        for (Map.Entry<Node, List<Node>> entry : graph.entrySet()) {
             Node k = entry.getKey();
             List<Node> v = new ArrayList<>(entry.getValue());
             copied.put(k, v);
@@ -254,7 +275,7 @@ public class WorkflowNet {
      * Returns node by nodeId.
      */
     private Node findNode(String nodeId) {
-        for (Node node: nodes) {
+        for (Node node : nodes) {
             if (node.id.equals(nodeId)) {
                 return node;
             }

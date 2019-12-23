@@ -1,18 +1,20 @@
 package cn.aneureka;
 
-import cn.aneureka.model.Node;
 import cn.aneureka.model.Place;
 import cn.aneureka.model.Transition;
 import cn.aneureka.model.WorkflowNet;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Iterator;
-import java.util.List;
+import java.io.IOException;
+
 
 /**
  * @author Aneureka
@@ -22,33 +24,48 @@ import java.util.List;
 @SuppressWarnings("ALL")
 public class Parser {
 
-    public WorkflowNet parse(String filePath) throws FileNotFoundException, DocumentException {
+    public WorkflowNet parse(String filePath) throws FileNotFoundException {
         File file = new File(filePath);
         if (!file.exists()) {
             throw new FileNotFoundException();
         }
         WorkflowNet workflowNet = new WorkflowNet();
-        Document document = new SAXReader().read(file);
-        Element root = document.getRootElement();
-        Element net = root.element("net");
-        for (Iterator<Element> it = net.elementIterator("place"); it.hasNext();) {
-            Element e = it.next();
-            String id = e.attributeValue("id");
-            workflowNet.addNode(new Place(id));
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = null;
+        try {
+            documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document document = documentBuilder.parse(file);
+            Element root = document.getDocumentElement();
+            Element net = (Element) root.getElementsByTagName("net").item(0);
+            NodeList placeNodes = net.getElementsByTagName("place");
+            for (int i = 0; i < placeNodes.getLength(); i++) {
+                Element element = (Element) placeNodes.item(i);
+                String id = element.getAttribute("id");
+                workflowNet.addNode(new Place(id));
+            }
+            NodeList transitionNodes = net.getElementsByTagName("transition");
+            for (int i = 0; i < transitionNodes.getLength(); i++) {
+                Element element = (Element) transitionNodes.item(i);
+                String id = element.getAttribute("id");
+                workflowNet.addNode(new Transition(id));
+            }
+            NodeList arcNodes = net.getElementsByTagName("arc");
+            for (int i = 0; i < arcNodes.getLength(); i++) {
+                Element element = (Element) arcNodes.item(i);
+                String sourceId = element.getAttribute("source");
+                String targetId = element.getAttribute("target");
+                workflowNet.addEdge(sourceId, targetId);
+            }
+            workflowNet.init();
+            return workflowNet;
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        for (Iterator<Element> it = net.elementIterator("transition"); it.hasNext();) {
-            Element e = it.next();
-            String id = e.attributeValue("id");
-            workflowNet.addNode(new Transition(id));
-        }
-        for (Iterator<Element> it = net.elementIterator("arc"); it.hasNext();) {
-            Element e = it.next();
-            String sourceId = e.attributeValue("source");
-            String targetId = e.attributeValue("target");
-            workflowNet.addEdge(sourceId, targetId);
-        }
-        workflowNet.init();
-        return workflowNet;
+        return null;
     }
 
     public static void main(String[] args) {
@@ -57,11 +74,9 @@ public class Parser {
         try {
             WorkflowNet net = parser.parse(modelFile);
             System.out.println(net);
-            net.getLogOfGraph();
+            net.getLogOfGraph(null);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (DocumentException e) {
-            e.printStackTrace();
+            System.err.println("model file not found: " + modelFile);
         }
     }
 
