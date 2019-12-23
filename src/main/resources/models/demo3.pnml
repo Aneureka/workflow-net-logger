@@ -1,42 +1,49 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <pnml>
 <net id="workflownet" type="http://www.informatik.hu-berlin.de/top/pnml/basicPNML.rng">
-    <place id="place_0"></place>
-    <place id="place_1"></place>
-    <place id="place_2"></place>
-    <place id="place_3"></place>
-    <place id="place_4"></place>
-    <place id="place_5"></place>
-    <place id="place_6"></place>
-    <transition id="trans_0"></transition>
-    <transition id="trans_1"></transition>
-    <transition id="trans_2"></transition>
-    <transition id="trans_3"></transition>
-    <transition id="trans_4"></transition>
-    <transition id="trans_5"></transition>
-    <transition id="trans_6"></transition>
-    <transition id="trans_7"></transition>
-    <transition id="trans_8"></transition>
-    <transition id="trans_9"></transition>
-    <arc id="arc_0" source="place_0" target="trans_0"></arc>
-    <arc id="arc_1" source="trans_0" target="place_1"></arc>
-    <arc id="arc_0" source="place_1" target="trans_1"></arc>
-    <arc id="arc_0" source="place_1" target="trans_2"></arc>
-    <arc id="arc_0" source="place_1" target="trans_3"></arc>
-    <arc id="arc_1" source="trans_1" target="place_2"></arc>
-    <arc id="arc_1" source="trans_2" target="place_2"></arc>
-    <arc id="arc_1" source="trans_3" target="place_2"></arc>
-    <arc id="arc_0" source="place_2" target="trans_4"></arc>
-    <arc id="arc_1" source="trans_4" target="place_3"></arc>
-    <arc id="arc_0" source="place_3" target="trans_5"></arc>
-    <arc id="arc_1" source="trans_5" target="place_4"></arc>
-    <arc id="arc_0" source="place_4" target="trans_6"></arc>
-    <arc id="arc_0" source="place_4" target="trans_7"></arc>
-    <arc id="arc_1" source="trans_6" target="place_5"></arc>
-    <arc id="arc_1" source="trans_7" target="place_5"></arc>
-    <arc id="arc_0" source="place_5" target="trans_8"></arc>
-    <arc id="arc_1" source="trans_8" target="place_1"></arc>
-    <arc id="arc_0" source="place_3" target="trans_9"></arc>
-    <arc id="arc_1" source="trans_9" target="place_6"></arc>    
+    <place id="0"></place>
+    <place id="1"></place>
+    <place id="2"></place>
+    <place id="3"></place>
+    <place id="4"></place>
+    <place id="5"></place>
+    <place id="6"></place>
+    <place id="7"></place>
+    <place id="8"></place>
+    <transition id="a"><text>1</text></transition>
+    <transition id="b"><text>1</text></transition>
+    <transition id="c"><text>1</text></transition>
+    <transition id="d"><text>1</text></transition>
+    <transition id="e"><text>1</text></transition>
+    <transition id="f"><text>1</text></transition>
+    <transition id="g"><text>1</text></transition>
+    <transition id="h"><text>1</text></transition>
+    <transition id="i"><text>1</text></transition>
+    <transition id="j"><text>1</text></transition>
+    <transition id="k"><text>1</text></transition>
+    <arc id="arc_0" source="0" target="a"></arc>
+    <arc id="arc_1" source="a" target="1"></arc>
+    <arc id="arc_0" source="1" target="b"></arc>
+    <arc id="arc_0" source="1" target="c"></arc>
+    <arc id="arc_0" source="b" target="2"></arc>
+    <arc id="arc_1" source="c" target="2"></arc>
+    <arc id="arc_1" source="2" target="d"></arc>
+    <arc id="arc_1" source="d" target="3"></arc>
+    <arc id="arc_0" source="3" target="e"></arc>
+    <arc id="arc_1" source="e" target="8"></arc>
+    <arc id="arc_0" source="3" target="f"></arc>
+    <arc id="arc_1" source="f" target="4"></arc>
+    <arc id="arc_0" source="4" target="g"></arc>
+    <arc id="arc_0" source="g" target="5"></arc>
+    <arc id="arc_1" source="5" target="h"></arc>
+    <arc id="arc_1" source="h" target="5"></arc>
+    <arc id="arc_0" source="5" target="k"></arc>
+    <arc id="arc_1" source="g" target="6"></arc>
+    <arc id="arc_0" source="6" target="i"></arc>
+    <arc id="arc_0" source="6" target="j"></arc>
+    <arc id="arc_1" source="i" target="7"></arc>
+    <arc id="arc_1" source="j" target="7"></arc>
+    <arc id="arc_1" source="7" target="k"></arc>
+    <arc id="arc_1" source="k" target="8"></arc>
 </net>
 </pnml>

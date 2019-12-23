@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<pnml>
+<net id="workflownet" type="http://www.informatik.hu-berlin.de/top/pnml/basicPNML.rng">
+    <place id="3"></place>
+    <place id="4"></place>
+    <place id="5"></place>
+    <place id="8"></place>
+    <transition id="f"></transition>
+    <transition id="g"></transition>
+    <transition id="h"></transition>
+    <transition id="k"></transition>
+    <arc id="arc_0" source="3" target="f"></arc>
+    <arc id="arc_1" source="f" target="4"></arc>
+    <arc id="arc_0" source="4" target="g"></arc>
+    <arc id="arc_0" source="g" target="5"></arc>
+    <arc id="arc_1" source="5" target="h"></arc>
+    <arc id="arc_1" source="h" target="5"></arc>
+    <arc id="arc_0" source="5" target="k"></arc>
+    <arc id="arc_1" source="k" target="8"></arc>
+</net>
+</pnml>

@@ -13,7 +13,7 @@ public class Logger {
 
     public static void main(String[] args) {
         Logger logger = new Logger();
-        String modelFile = "src/main/resources/models/Model1.pnml";
+        String modelFile = "src/main/resources/models/demo3.pnml";
         String logFile = "src/main/resources/logs/log1.txt";
         logger.getLogOfModel(modelFile, logFile);
     }

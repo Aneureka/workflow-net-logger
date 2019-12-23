@@ -59,7 +59,7 @@ public class WorkflowNet {
 
     public static void removeEdge(Map<Node, List<Node>> graph, Node source, Node target) {
         if (graph.containsKey(source)) {
-            System.out.println(String.format("remove: %s -> %s", source.toString(), target.toString()));
+//            System.out.println(String.format("remove: %s -> %s", source.toString(), target.toString()));
             graph.get(source).remove(target);
         }
     }
@@ -177,7 +177,6 @@ public class WorkflowNet {
 
     private static void getLogOfGraph(Map<Node, List<Node>> graph, Node exit, List<Node> curNodes, Set<Node> entries, List<Node> path, List<List<Node>> res) {
         curNodes = unreachableNodes(graph, curNodes);
-//        System.out.println(curNodes);
         for (int i = 0; i < curNodes.size(); i++) {
             Node curNode = curNodes.get(i);
             if (curNode.equals(exit)) {
@@ -195,9 +194,11 @@ public class WorkflowNet {
             Map<Node, List<Node>> tmpGraph = copyOfGraph(graph);
             if (curNode instanceof Place) {
                 for (Node v: graph.get(curNode)) {
-                    curNodes.add(v);
-                    getLogOfGraph(tmpGraph, exit, curNodes, entries, path, res);
-                    curNodes.remove(v);
+                    if (outDegreeOf(tmpGraph, v) > 0 || v.equals(exit)) {
+                        curNodes.add(v);
+                        getLogOfGraph(tmpGraph, exit, curNodes, entries, path, res);
+                        curNodes.remove(v);
+                    }
                 }
             } else {
                 List<Node> neighbors = graph.get(curNode);
@@ -220,15 +221,15 @@ public class WorkflowNet {
         }
     }
 
-    private List<List<Node>> filterLog(List<List<Node>> logs) {
+    private static List<List<Node>> filterLog(List<List<Node>> logs) {
         return logs.stream().map(log -> log.stream().filter(e -> e instanceof Transition).collect(Collectors.toList())).distinct().collect(Collectors.toList());
     }
 
-    private void printLog(List<List<Node>> logs) {
-        System.out.println("==== " + logs.size() + " ====");
+    private static void printLog(List<List<Node>> logs) {
         for (List<Node> log: logs) {
             System.out.println(log.stream().map(Node::toString).collect(Collectors.joining(" -> ")));
         }
+        System.out.println("==== " + logs.size() + " ====");
     }
 
 }
