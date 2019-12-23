@@ -16,11 +16,6 @@ public class Transition extends Node {
     }
 
     @Override
-    public Node copy() {
-        return new Transition(this.id, this.name);
-    }
-
-    @Override
     public String toString() {
         return String.format("[%s]", super.toString());
     }

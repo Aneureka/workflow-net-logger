@@ -16,11 +16,6 @@ public class Place extends Node {
     }
 
     @Override
-    public Node copy() {
-        return new Place(this.id, this.name);
-    }
-
-    @Override
     public String toString() {
         return String.format("(%s)", super.toString());
     }

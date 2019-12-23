@@ -25,8 +25,6 @@ public abstract class Node {
         this.name = name;
     }
 
-    public abstract Node copy();
-
     @Override
     public boolean equals(Object object) {
         if (this == object) {
