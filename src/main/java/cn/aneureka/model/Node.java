@@ -7,7 +7,7 @@ import java.util.Objects;
  * @createdAt 2019-12-19 20:52
  * @description
  **/
-public class Node {
+public abstract class Node {
 
     protected String id;
 
@@ -17,6 +17,8 @@ public class Node {
     public Node(String id) {
         this.id = id;
     }
+
+    public abstract Node copy();
 
     @Override
     public boolean equals(Object object) {
@@ -28,6 +30,11 @@ public class Node {
         }
         Node node = (Node) object;
         return id.equals(node.id);
+    }
+
+    @Override
+    public String toString() {
+        return this.id;
     }
 
     @Override

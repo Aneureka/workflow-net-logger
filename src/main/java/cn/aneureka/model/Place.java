@@ -15,7 +15,12 @@ public class Place extends Node {
     }
 
     @Override
+    public Node copy() {
+        return new Place(this.id);
+    }
+
+    @Override
     public String toString() {
-        return String.format("(%s)", id);
+        return String.format("(%s)", super.toString());
     }
 }
