@@ -2,12 +2,12 @@
 <pnml>
 <!-- simple parallel -->
 <net id="workflownet" type="http://www.informatik.hu-berlin.de/top/pnml/basicPNML.rng">
-    <place id="place_0"></place>
-    <place id="place_1"></place>
-    <place id="place_2"></place>
-    <place id="place_3"></place>
-    <transition id="trans_0"></transition>
-    <transition id="trans_1"></transition>
+    <place id="place_0"><name><text>0</text></name></place>
+    <place id="place_1"><name><text>1</text></name></place>
+    <place id="place_2"><name><text>2</text></name></place>
+    <place id="place_3"><name><text>3</text></name></place>
+    <transition id="trans_0"><name><text>0</text></name></transition>
+    <transition id="trans_1"><name><text>1</text></name></transition>
     <arc id="arc_0" source="place_0" target="trans_0"></arc>
     <arc id="arc_1" source="trans_0" target="place_1"></arc>
     <arc id="arc_1" source="trans_0" target="place_2"></arc>

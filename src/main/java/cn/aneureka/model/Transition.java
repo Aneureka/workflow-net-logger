@@ -7,16 +7,17 @@ package cn.aneureka.model;
  **/
 public class Transition extends Node {
 
-    public Transition() {
-    }
-
     public Transition(String id) {
         super(id);
     }
 
+    public Transition(String id, String name) {
+        super(id, name);
+    }
+
     @Override
     public Node copy() {
-        return new Transition(this.id);
+        return new Transition(this.id, this.name);
     }
 
     @Override

@@ -11,11 +11,18 @@ public abstract class Node {
 
     protected String id;
 
+    protected String name;
+
     public Node() {
     }
 
     public Node(String id) {
         this.id = id;
+    }
+
+    public Node(String id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public abstract Node copy();
@@ -34,7 +41,7 @@ public abstract class Node {
 
     @Override
     public String toString() {
-        return this.id;
+        return this.name;
     }
 
     @Override
@@ -50,5 +57,12 @@ public abstract class Node {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
 

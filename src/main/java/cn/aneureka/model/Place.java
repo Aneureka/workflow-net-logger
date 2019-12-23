@@ -7,16 +7,17 @@ package cn.aneureka.model;
  **/
 public class Place extends Node {
 
-    public Place() {
-    }
-
     public Place(String id) {
         super(id);
     }
 
+    public Place(String id, String name) {
+        super(id, name);
+    }
+
     @Override
     public Node copy() {
-        return new Place(this.id);
+        return new Place(this.id, this.name);
     }
 
     @Override

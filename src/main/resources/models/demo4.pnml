@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <pnml>
 <net id="workflownet" type="http://www.informatik.hu-berlin.de/top/pnml/basicPNML.rng">
-    <place id="0"></place>
-    <place id="1"></place>
-    <place id="2"></place>
-    <place id="3"></place>
-    <place id="4"></place>
-    <place id="5"></place>
-    <place id="6"></place>
-    <place id="7"></place>
-    <place id="8"></place>
-    <transition id="a"></transition>
-    <transition id="b"></transition>
-    <transition id="c"></transition>
-    <transition id="d"></transition>
-    <transition id="f"></transition>
-    <transition id="g"></transition>
-    <transition id="h"></transition>
-    <transition id="i"></transition>
-    <transition id="j"></transition>
-    <transition id="k"></transition>
+    <place id="0"><name><text>0</text></name></place>
+    <place id="1"><name><text>1</text></name></place>
+    <place id="2"><name><text>2</text></name></place>
+    <place id="3"><name><text>3</text></name></place>
+    <place id="4"><name><text>4</text></name></place>
+    <place id="5"><name><text>5</text></name></place>
+    <place id="6"><name><text>6</text></name></place>
+    <place id="7"><name><text>7</text></name></place>
+    <place id="8"><name><text>8</text></name></place>
+    <transition id="a"><name><text>a</text></name></transition>
+    <transition id="b"><name><text>b</text></name></transition>
+    <transition id="c"><name><text>c</text></name></transition>
+    <transition id="d"><name><text>d</text></name></transition>
+    <transition id="f"><name><text>f</text></name></transition>
+    <transition id="g"><name><text>g</text></name></transition>
+    <transition id="h"><name><text>h</text></name></transition>
+    <transition id="i"><name><text>i</text></name></transition>
+    <transition id="j"><name><text>j</text></name></transition>
+    <transition id="k"><name><text>k</text></name></transition>
     <arc id="arc_0" source="0" target="a"></arc>
     <arc id="arc_1" source="a" target="1"></arc>
     <arc id="arc_0" source="1" target="b"></arc>

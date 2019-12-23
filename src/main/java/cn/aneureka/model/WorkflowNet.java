@@ -72,15 +72,23 @@ public class WorkflowNet {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[Node]").append("\n");
+        sb.append("[Place]").append("\n");
         for (Node node : nodes) {
-            sb.append(node.toString()).append(" ");
+            if (node instanceof Place) {
+                sb.append(node.toString()).append(" ");
+            }
+        }
+        sb.append("\n").append("[Transition]").append("\n");
+        for (Node node : nodes) {
+            if (node instanceof Transition) {
+                sb.append(node.toString()).append(" ");
+            }
         }
         sb.append("\n").append("[Graph]");
         for (Map.Entry<Node, List<Node>> entry : graph.entrySet()) {
             sb.append("\n");
             sb.append(entry.getKey().toString()).append(" => ");
-            sb.append(String.join(" ", entry.getValue().stream().map(Object::toString).collect(Collectors.toList())));
+            sb.append(entry.getValue().stream().map(Object::toString).collect(Collectors.joining(" ")));
         }
         sb.append("\n");
         return sb.toString();

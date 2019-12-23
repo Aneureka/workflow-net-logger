@@ -41,13 +41,19 @@ public class Parser {
             for (int i = 0; i < placeNodes.getLength(); i++) {
                 Element element = (Element) placeNodes.item(i);
                 String id = element.getAttribute("id");
-                workflowNet.addNode(new Place(id));
+                Element nameNode = (Element) element.getElementsByTagName("name").item(0);
+                Element textNode = (Element) element.getElementsByTagName("text").item(0);
+                String name = textNode.getTextContent();
+                workflowNet.addNode(new Place(id, name));
             }
             NodeList transitionNodes = net.getElementsByTagName("transition");
             for (int i = 0; i < transitionNodes.getLength(); i++) {
                 Element element = (Element) transitionNodes.item(i);
                 String id = element.getAttribute("id");
-                workflowNet.addNode(new Transition(id));
+                Element nameNode = (Element) element.getElementsByTagName("name").item(0);
+                Element textNode = (Element) element.getElementsByTagName("text").item(0);
+                String name = textNode.getTextContent();
+                workflowNet.addNode(new Transition(id, name));
             }
             NodeList arcNodes = net.getElementsByTagName("arc");
             for (int i = 0; i < arcNodes.getLength(); i++) {
