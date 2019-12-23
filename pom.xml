@@ -8,14 +8,6 @@
     <artifactId>workflow-net-logger</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <dependencies>
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
