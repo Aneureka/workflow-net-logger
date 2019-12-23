@@ -56,8 +56,7 @@ public class Parser {
         String modelFile = "src/main/resources/models/Model2.pnml";
         try {
             WorkflowNet net = parser.parse(modelFile);
-//            System.out.println(net);
-//            System.out.println();
+            System.out.println(net);
             net.getLogOfGraph();
         } catch (FileNotFoundException e) {
             e.printStackTrace();

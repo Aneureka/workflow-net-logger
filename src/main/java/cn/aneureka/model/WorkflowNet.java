@@ -40,15 +40,6 @@ public class WorkflowNet {
         addEdge(source, target);
     }
 
-    private Node findNode(String nodeId) {
-        for (Node node: nodes) {
-            if (node.id.equals(nodeId)) {
-                return node;
-            }
-        }
-        return null;
-    }
-
     public void addEdge(Node source, Node target) {
         List<Node> neighbors = graph.getOrDefault(source, new ArrayList<>());
         if (!neighbors.contains(target)) {
@@ -59,35 +50,8 @@ public class WorkflowNet {
 
     public static void removeEdge(Map<Node, List<Node>> graph, Node source, Node target) {
         if (graph.containsKey(source)) {
-//            System.out.println(String.format("remove: %s -> %s", source.toString(), target.toString()));
             graph.get(source).remove(target);
         }
-    }
-
-    private static Map<Node, List<Node>> copyOfGraph(Map<Node, List<Node>> graph) {
-        Map<Node, List<Node>> copied = new HashMap<>();
-        for (Map.Entry<Node, List<Node>> entry: graph.entrySet()) {
-            Node k = entry.getKey();
-            List<Node> v = new ArrayList<>(entry.getValue());
-            copied.put(k, v);
-        }
-        return copied;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[Node]").append("\n");
-        for (Node node: nodes) {
-            sb.append(node.toString()).append(" ");
-        }
-        sb.append("\n").append("[Graph]");
-        for (Map.Entry<Node, List<Node>> entry: graph.entrySet()) {
-            sb.append("\n");
-            sb.append(entry.getKey().toString()).append(" => ");
-            sb.append(StringUtils.join(entry.getValue().stream().map(Object::toString).collect(Collectors.toList()), " "));
-        }
-        return sb.toString();
     }
 
     public void init() {
@@ -104,79 +68,40 @@ public class WorkflowNet {
         }
     }
 
-    private static int inDegreeOf(Map<Node, List<Node>> graph, Node node) {
-        int res = 0;
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[Node]").append("\n");
+        for (Node node: nodes) {
+            sb.append(node.toString()).append(" ");
+        }
+        sb.append("\n").append("[Graph]");
         for (Map.Entry<Node, List<Node>> entry: graph.entrySet()) {
-            if (entry.getValue().contains(node)) {
-                res++;
-            }
+            sb.append("\n");
+            sb.append(entry.getKey().toString()).append(" => ");
+            sb.append(StringUtils.join(entry.getValue().stream().map(Object::toString).collect(Collectors.toList()), " "));
         }
-        return res;
+        sb.append("\n");
+        return sb.toString();
     }
 
-    private static int outDegreeOf(Map<Node, List<Node>> graph, Node node) {
-        if (graph.containsKey(node)) {
-            return graph.get(node).size();
-        } else {
-            return 0;
-        }
-    }
-
-    private static List<Node> unreachableNodes(Map<Node, List<Node>> graph, List<Node> nodes) {
-        List<Node> res = new ArrayList<>();
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i) instanceof Place) {
-                res.add(nodes.get(i));
-                continue;
-            }
-            boolean reachable = false;
-            for (int j = 0; j < nodes.size(); j++) {
-                if (i != j && isReachable(graph, nodes.get(j), nodes.get(i))) {
-                    reachable = true;
-                    break;
-                }
-            }
-            if (!reachable) {
-                res.add(nodes.get(i));
-            }
-        }
-        return res;
-    }
-
-    public boolean isReachable(Node source, Node target) {
-        return isReachable(this.graph, source, target);
-    }
-
-    private static boolean isReachable(Map<Node, List<Node>> graph, Node source, Node target) {
-        return isReachable(graph, source, target, new HashSet<>());
-    }
-
-    private static boolean isReachable(Map<Node, List<Node>> graph, Node cur, Node target, Set<Node> visited) {
-        if (cur.equals(target)) {
-            return true;
-        }
-        if (visited.contains(cur) || !graph.containsKey(cur)) {
-            return false;
-        }
-        visited.add(cur);
-        boolean res = false;
-        for (Node v: graph.get(cur)) {
-            res = res || isReachable(graph, v, target, visited);
-        }
-        return res;
-    }
-
+    /**
+     * Collects and prints the logs of graph.
+     */
     public void getLogOfGraph() {
         List<List<Node>> res = new ArrayList<>();
         List<Node> curNodes = new ArrayList<>();
         curNodes.add(this.in);
         getLogOfGraph(this.graph, this.out, curNodes, new HashSet<>(), new ArrayList<>(), res);
-        res = filterLog(res);
-        printLog(res);
+        res = filterLogs(res);
+        printLogs(res);
     }
 
+    /**
+     * Collects the execution (raw) logs of graph recursively.
+     */
     private static void getLogOfGraph(Map<Node, List<Node>> graph, Node exit, List<Node> curNodes, Set<Node> entries, List<Node> path, List<List<Node>> res) {
-        curNodes = unreachableNodes(graph, curNodes);
+        curNodes = removeAccessibleNodes(graph, curNodes);
         for (int i = 0; i < curNodes.size(); i++) {
             Node curNode = curNodes.get(i);
             if (curNode.equals(exit)) {
@@ -221,15 +146,119 @@ public class WorkflowNet {
         }
     }
 
-    private static List<List<Node>> filterLog(List<List<Node>> logs) {
-        return logs.stream().map(log -> log.stream().filter(e -> e instanceof Transition).collect(Collectors.toList())).distinct().collect(Collectors.toList());
+    /**
+     * Remove places in log items and return new logs.
+     */
+    private static List<List<Node>> filterLogs(List<List<Node>> logs) {
+        return logs.stream()
+                .map(log -> log.stream().filter(e -> e instanceof Transition).collect(Collectors.toList()))
+                .distinct()
+                .collect(Collectors.toList());
     }
 
-    private static void printLog(List<List<Node>> logs) {
+    private static void printLogs(List<List<Node>> logs) {
         for (List<Node> log: logs) {
             System.out.println(log.stream().map(Node::toString).collect(Collectors.joining(" -> ")));
         }
-        System.out.println("==== " + logs.size() + " ====");
+        System.out.println(String.format("=== %d ===", logs.size()));
     }
 
+    /**
+     * Returns in-degree of the given node.
+     */
+    private static int inDegreeOf(Map<Node, List<Node>> graph, Node node) {
+        int res = 0;
+        for (Map.Entry<Node, List<Node>> entry: graph.entrySet()) {
+            if (entry.getValue().contains(node)) {
+                res++;
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Returns out-degree of the given node.
+     */
+    private static int outDegreeOf(Map<Node, List<Node>> graph, Node node) {
+        if (graph.containsKey(node)) {
+            return graph.get(node).size();
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Removes nodes that can be assessed by others and return.
+     */
+    private static List<Node> removeAccessibleNodes(Map<Node, List<Node>> graph, List<Node> nodes) {
+        List<Node> res = new ArrayList<>();
+        for (int i = 0; i < nodes.size(); i++) {
+            if (nodes.get(i) instanceof Place) {
+                res.add(nodes.get(i));
+                continue;
+            }
+            boolean Accessible = false;
+            for (int j = 0; j < nodes.size(); j++) {
+                if (i != j && isAccessible(graph, nodes.get(j), nodes.get(i))) {
+                    Accessible = true;
+                    break;
+                }
+            }
+            if (!Accessible) {
+                res.add(nodes.get(i));
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Checks whether {target} can be reached by {source} in the given graph.
+     */
+    private static boolean isAccessible(Map<Node, List<Node>> graph, Node source, Node target) {
+        return isAccessible(graph, source, target, new HashSet<>());
+    }
+
+    /**
+     * Performs DFS to check accessibility in the given graph.
+     */
+    private static boolean isAccessible(Map<Node, List<Node>> graph, Node cur, Node target, Set<Node> visited) {
+        if (cur.equals(target)) {
+            return true;
+        }
+        if (visited.contains(cur) || !graph.containsKey(cur)) {
+            return false;
+        }
+        visited.add(cur);
+        boolean res = false;
+        for (Node v: graph.get(cur)) {
+            res = res || isAccessible(graph, v, target, visited);
+        }
+        return res;
+    }
+
+    /**
+     * Returns deep copy of the given graph.
+     * Nodes are not recreated.
+     */
+    private static Map<Node, List<Node>> copyOfGraph(Map<Node, List<Node>> graph) {
+        Map<Node, List<Node>> copied = new HashMap<>();
+        for (Map.Entry<Node, List<Node>> entry: graph.entrySet()) {
+            Node k = entry.getKey();
+            List<Node> v = new ArrayList<>(entry.getValue());
+            copied.put(k, v);
+        }
+        return copied;
+    }
+
+    /**
+     * Returns node by nodeId.
+     */
+    private Node findNode(String nodeId) {
+        for (Node node: nodes) {
+            if (node.id.equals(nodeId)) {
+                return node;
+            }
+        }
+        return null;
+    }
 }
