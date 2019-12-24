@@ -108,6 +108,8 @@ public class WorkflowNet {
         } else {
             try {
                 printLogsToFile(logs, logFile);
+                System.out.println(String.format("Generated %d logs to: %s", logs.size(), logFile));
+
             } catch (IOException e) {
                 System.err.println("logFile is invalid");
             }
@@ -118,7 +120,9 @@ public class WorkflowNet {
      * Collects the execution (raw) logs of graph recursively.
      */
     private static void getLogOfGraph(Map<Node, List<Node>> graph, Node exit, List<Node> curNodes, Set<Node> cycleEntries, List<Node> path, List<List<Node>> res) {
+//        System.out.println(distinct(res).size());
         curNodes = removeAccessibleNodes(graph, curNodes);
+        System.out.println(curNodes);
         for (int i = 0; i < curNodes.size(); i++) {
             Node curNode = curNodes.get(i);
             if (curNode.equals(exit)) {
@@ -127,9 +131,6 @@ public class WorkflowNet {
             }
             if (!graph.containsKey(curNode)) {
                 continue;
-            }
-            if (curNode instanceof Transition) {
-                path.add(curNode);
             }
             int curNodeIndex = curNodes.indexOf(curNode);
             curNodes.remove(curNodeIndex);
@@ -143,6 +144,7 @@ public class WorkflowNet {
                     }
                 }
             } else {
+                path.add(curNode);
                 List<Node> neighbors = graph.get(curNode);
                 Set<Node> tmpEntries = new HashSet<>(cycleEntries);
                 for (Node v : neighbors) {
@@ -157,8 +159,6 @@ public class WorkflowNet {
                 curNodes.addAll(neighbors);
                 getLogOfGraph(tmpGraph, exit, curNodes, tmpEntries, path, res);
                 curNodes.removeAll(neighbors);
-            }
-            if (curNode instanceof Transition) {
                 path.remove(path.size() - 1);
             }
             curNodes.add(curNodeIndex, curNode);
@@ -260,7 +260,7 @@ public class WorkflowNet {
         }
         visited.add(cur);
         boolean res = false;
-        for (Node v : graph.get(cur)) {
+        for (Node v: graph.get(cur)) {
             res = res || isAccessible(graph, v, target, visited);
         }
         return res;

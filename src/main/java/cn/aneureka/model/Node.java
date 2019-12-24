@@ -7,7 +7,7 @@ import java.util.Objects;
  * @createdAt 2019-12-19 20:52
  * @description
  **/
-public abstract class Node {
+public class Node {
 
     protected String id;
 

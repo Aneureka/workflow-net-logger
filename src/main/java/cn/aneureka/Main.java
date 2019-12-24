@@ -12,13 +12,13 @@ import java.io.IOException;
  * @createdAt 2019-12-19 20:38
  * @description
  **/
-public class Logger {
+public class Main {
 
-    public void getLogOfModel(String modelFile, String logFile) {
+    public static void getLogOfModel(String modelFile, String logFile) {
         Parser parser = new Parser();
         try {
             WorkflowNet net = parser.parse(modelFile);
-            System.out.println(net);
+//            System.out.println(net);
             net.getLogOfGraph(logFile);
         } catch (FileNotFoundException e) {
             System.err.println("model file not found: " + modelFile);
@@ -27,9 +27,8 @@ public class Logger {
     }
 
     public static void main(String[] args) {
-        Logger logger = new Logger();
-        String modelFile = "src/main/resources/models/Model2.pnml";
-        String logFile = "src/main/resources/logs/log1.txt";
-        logger.getLogOfModel(modelFile, logFile);
+        String modelFile = "src/main/resources/models/Model3.pnml";
+        String logFile = "src/main/resources/logs/log3.txt";
+        Main.getLogOfModel(modelFile, logFile);
     }
 }
