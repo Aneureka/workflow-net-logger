@@ -102,7 +102,7 @@ public class WorkflowNet {
         List<Node> curNodes = new ArrayList<>();
         curNodes.add(this.in);
         getLogOfGraph(this.graph, this.out, curNodes, new HashSet<>(), new ArrayList<>(), logs);
-        logs = filterLogs(logs);
+        logs = distinct(logs);
         if (logFile == null) {
             printLogs(logs);
         } else {
@@ -117,20 +117,20 @@ public class WorkflowNet {
     /**
      * Collects the execution (raw) logs of graph recursively.
      */
-    private static void getLogOfGraph(Map<Node, List<Node>> graph, Node exit, List<Node> curNodes, Set<Node> entries, List<Node> path, List<List<Node>> res) {
+    private static void getLogOfGraph(Map<Node, List<Node>> graph, Node exit, List<Node> curNodes, Set<Node> cycleEntries, List<Node> path, List<List<Node>> res) {
         curNodes = removeAccessibleNodes(graph, curNodes);
         for (int i = 0; i < curNodes.size(); i++) {
             Node curNode = curNodes.get(i);
             if (curNode.equals(exit)) {
-                path.add(curNode);
                 res.add(new ArrayList<>(path));
-                path.remove(curNode);
                 continue;
             }
             if (!graph.containsKey(curNode)) {
                 continue;
             }
-            path.add(curNode);
+            if (curNode instanceof Transition) {
+                path.add(curNode);
+            }
             int curNodeIndex = curNodes.indexOf(curNode);
             curNodes.remove(curNodeIndex);
             Map<Node, List<Node>> tmpGraph = copyOfGraph(graph);
@@ -138,16 +138,16 @@ public class WorkflowNet {
                 for (Node v : graph.get(curNode)) {
                     if (outDegreeOf(tmpGraph, v) > 0 || v.equals(exit)) {
                         curNodes.add(v);
-                        getLogOfGraph(tmpGraph, exit, curNodes, entries, path, res);
+                        getLogOfGraph(tmpGraph, exit, curNodes, cycleEntries, path, res);
                         curNodes.remove(v);
                     }
                 }
             } else {
                 List<Node> neighbors = graph.get(curNode);
-                Set<Node> tmpEntries = new HashSet<>(entries);
+                Set<Node> tmpEntries = new HashSet<>(cycleEntries);
                 for (Node v : neighbors) {
                     if (inDegreeOf(graph, v) > 1 && v instanceof Place) {
-                        if (entries.contains(v)) {
+                        if (cycleEntries.contains(v)) {
                             removeEdge(tmpGraph, curNode, v);
                         } else {
                             tmpEntries.add(v);
@@ -158,17 +158,18 @@ public class WorkflowNet {
                 getLogOfGraph(tmpGraph, exit, curNodes, tmpEntries, path, res);
                 curNodes.removeAll(neighbors);
             }
-            path.remove(path.size() - 1);
+            if (curNode instanceof Transition) {
+                path.remove(path.size() - 1);
+            }
             curNodes.add(curNodeIndex, curNode);
         }
     }
 
     /**
-     * Remove places in log items and return new logs.
+     * Remove duplicated logs.
      */
-    private static List<List<Node>> filterLogs(List<List<Node>> logs) {
+    private static List<List<Node>> distinct(List<List<Node>> logs) {
         return logs.stream()
-                .map(log -> log.stream().filter(e -> e instanceof Transition).collect(Collectors.toList()))
                 .distinct()
                 .collect(Collectors.toList());
     }

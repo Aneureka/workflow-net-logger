@@ -76,7 +76,7 @@ public class Parser {
 
     public static void main(String[] args) {
         Parser parser = new Parser();
-        String modelFile = "src/main/resources/models/Model2.pnml";
+        String modelFile = "src/main/resources/models/Model3.pnml";
         try {
             WorkflowNet net = parser.parse(modelFile);
             System.out.println(net);
