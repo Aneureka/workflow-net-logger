@@ -41,18 +41,30 @@ public class WorkflowNet {
         addEdge(source, target);
     }
 
-    public void addEdge(Node source, Node target) {
+    private void addEdge(Node source, Node target) {
+        addEdge(this.graph, source, target, -1);
+    }
+
+    private static void addEdge(Map<Node, List<Node>> graph, Node source, Node target, int index) {
         List<Node> neighbors = graph.getOrDefault(source, new ArrayList<>());
         if (!neighbors.contains(target)) {
-            neighbors.add(target);
+            if (index == -1) {
+                neighbors.add(target);
+            } else {
+                neighbors.add(index, target);
+            }
         }
         graph.put(source, neighbors);
     }
 
-    public static void removeEdge(Map<Node, List<Node>> graph, Node source, Node target) {
+    private static int removeEdge(Map<Node, List<Node>> graph, Node source, Node target) {
         if (graph.containsKey(source)) {
-            graph.get(source).remove(target);
+            List<Node> neighbors = graph.get(source);
+            int res = neighbors.indexOf(target);
+            neighbors.remove(target);
+            return res;
         }
+        return -1;
     }
 
     public void init() {
@@ -122,7 +134,7 @@ public class WorkflowNet {
     private static void getLogOfGraph(Map<Node, List<Node>> graph, Node exit, List<Node> curNodes, Set<Node> cycleEntries, List<Node> path, List<List<Node>> res) {
 //        System.out.println(distinct(res).size());
         curNodes = removeAccessibleNodes(graph, curNodes);
-        System.out.println(curNodes);
+//        System.out.println(curNodes);
         for (int i = 0; i < curNodes.size(); i++) {
             Node curNode = curNodes.get(i);
             if (curNode.equals(exit)) {
@@ -134,30 +146,41 @@ public class WorkflowNet {
             }
             int curNodeIndex = curNodes.indexOf(curNode);
             curNodes.remove(curNodeIndex);
-            Map<Node, List<Node>> tmpGraph = copyOfGraph(graph);
             if (curNode instanceof Place) {
                 for (Node v : graph.get(curNode)) {
-                    if (outDegreeOf(tmpGraph, v) > 0 || v.equals(exit)) {
+                    if (outDegreeOf(graph, v) > 0 || v.equals(exit)) {
                         curNodes.add(v);
-                        getLogOfGraph(tmpGraph, exit, curNodes, cycleEntries, path, res);
+                        getLogOfGraph(graph, exit, curNodes, cycleEntries, path, res);
                         curNodes.remove(v);
                     }
                 }
             } else {
                 path.add(curNode);
                 List<Node> neighbors = graph.get(curNode);
-                Set<Node> tmpEntries = new HashSet<>(cycleEntries);
+                Set<Node> tmpEntries = new HashSet<>();
+                List<Node> sources = new ArrayList<>();
+                List<Node> targets = new ArrayList<>();
+                List<Integer> indices = new ArrayList<>();
                 for (Node v : neighbors) {
                     if (inDegreeOf(graph, v) > 1 && v instanceof Place) {
                         if (cycleEntries.contains(v)) {
-                            removeEdge(tmpGraph, curNode, v);
+                            sources.add(curNode);
+                            targets.add(v);
                         } else {
                             tmpEntries.add(v);
                         }
                     }
                 }
                 curNodes.addAll(neighbors);
-                getLogOfGraph(tmpGraph, exit, curNodes, tmpEntries, path, res);
+                cycleEntries.addAll(tmpEntries);
+                for (int j = 0; j < sources.size(); j++) {
+                    indices.add(removeEdge(graph, sources.get(j), targets.get(j)));
+                }
+                getLogOfGraph(graph, exit, curNodes, cycleEntries, path, res);
+                for (int j = 0; j < sources.size(); j++) {
+                    addEdge(graph, sources.get(j), targets.get(j), indices.get(j));
+                }
+                cycleEntries.removeAll(tmpEntries);
                 curNodes.removeAll(neighbors);
                 path.remove(path.size() - 1);
             }
