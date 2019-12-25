@@ -41,30 +41,19 @@ public class WorkflowNet {
         addEdge(source, target);
     }
 
-    private void addEdge(Node source, Node target) {
-        addEdge(this.graph, source, target, -1);
-    }
-
-    private static void addEdge(Map<Node, List<Node>> graph, Node source, Node target, int index) {
+    public void addEdge(Node source, Node target) {
         List<Node> neighbors = graph.getOrDefault(source, new ArrayList<>());
         if (!neighbors.contains(target)) {
-            if (index == -1) {
-                neighbors.add(target);
-            } else {
-                neighbors.add(index, target);
-            }
+            neighbors.add(target);
         }
         graph.put(source, neighbors);
     }
 
-    private static int removeEdge(Map<Node, List<Node>> graph, Node source, Node target) {
+    public static void removeEdge(Map<Node, List<Node>> graph, Node source, Node target) {
+//        System.out.println(source.toString() + " " + target.toString());
         if (graph.containsKey(source)) {
-            List<Node> neighbors = graph.get(source);
-            int res = neighbors.indexOf(target);
-            neighbors.remove(target);
-            return res;
+            graph.get(source).remove(target);
         }
-        return -1;
     }
 
     public void init() {
@@ -121,7 +110,6 @@ public class WorkflowNet {
             try {
                 printLogsToFile(logs, logFile);
                 System.out.println(String.format("Generated %d logs to: %s", logs.size(), logFile));
-
             } catch (IOException e) {
                 System.err.println("logFile is invalid");
             }
@@ -132,9 +120,8 @@ public class WorkflowNet {
      * Collects the execution (raw) logs of graph recursively.
      */
     private static void getLogOfGraph(Map<Node, List<Node>> graph, Node exit, List<Node> curNodes, Set<Node> cycleEntries, List<Node> path, List<List<Node>> res) {
-//        System.out.println(distinct(res).size());
+//        System.out.println(path);
         curNodes = removeAccessibleNodes(graph, curNodes);
-//        System.out.println(curNodes);
         for (int i = 0; i < curNodes.size(); i++) {
             Node curNode = curNodes.get(i);
             if (curNode.equals(exit)) {
@@ -146,41 +133,29 @@ public class WorkflowNet {
             }
             int curNodeIndex = curNodes.indexOf(curNode);
             curNodes.remove(curNodeIndex);
+            Map<Node, List<Node>> tmpGraph = copyOfGraph(graph);
             if (curNode instanceof Place) {
                 for (Node v : graph.get(curNode)) {
-                    if (outDegreeOf(graph, v) > 0 || v.equals(exit)) {
+                    if (outDegreeOf(tmpGraph, v) > 0 || v.equals(exit)) {
                         curNodes.add(v);
-                        getLogOfGraph(graph, exit, curNodes, cycleEntries, path, res);
+                        getLogOfGraph(tmpGraph, exit, curNodes, cycleEntries, path, res);
                         curNodes.remove(v);
                     }
                 }
             } else {
                 path.add(curNode);
                 List<Node> neighbors = graph.get(curNode);
-                Set<Node> tmpEntries = new HashSet<>();
-                List<Node> sources = new ArrayList<>();
-                List<Node> targets = new ArrayList<>();
-                List<Integer> indices = new ArrayList<>();
+                Set<Node> tmpEntries = new HashSet<>(cycleEntries);
                 for (Node v : neighbors) {
-                    if (inDegreeOf(graph, v) > 1 && v instanceof Place) {
-                        if (cycleEntries.contains(v)) {
-                            sources.add(curNode);
-                            targets.add(v);
-                        } else {
-                            tmpEntries.add(v);
-                        }
+                    if (inDegreeOf(tmpGraph, v) > 1 && v instanceof Place) {
+                        tmpEntries.add(v);
+                    }
+                    if (cycleEntries.contains(v)) {
+                        removeEdge(tmpGraph, curNode, v);
                     }
                 }
                 curNodes.addAll(neighbors);
-                cycleEntries.addAll(tmpEntries);
-                for (int j = 0; j < sources.size(); j++) {
-                    indices.add(removeEdge(graph, sources.get(j), targets.get(j)));
-                }
-                getLogOfGraph(graph, exit, curNodes, cycleEntries, path, res);
-                for (int j = 0; j < sources.size(); j++) {
-                    addEdge(graph, sources.get(j), targets.get(j), indices.get(j));
-                }
-                cycleEntries.removeAll(tmpEntries);
+                getLogOfGraph(tmpGraph, exit, curNodes, tmpEntries, path, res);
                 curNodes.removeAll(neighbors);
                 path.remove(path.size() - 1);
             }
@@ -315,3 +290,5 @@ public class WorkflowNet {
         return null;
     }
 }
+
+

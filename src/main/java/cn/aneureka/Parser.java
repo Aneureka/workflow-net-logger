@@ -76,10 +76,10 @@ public class Parser {
 
     public static void main(String[] args) {
         Parser parser = new Parser();
-        String modelFile = "src/main/resources/models/lyp1.pnml";
+        String modelFile = "src/main/resources/models/1575897789165.pnml";
         try {
             WorkflowNet net = parser.parse(modelFile);
-            System.out.println(net);
+//            System.out.println(net);
             net.getLogOfGraph(null);
         } catch (FileNotFoundException e) {
             System.err.println("model file not found: " + modelFile);

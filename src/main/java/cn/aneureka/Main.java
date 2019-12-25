@@ -1,11 +1,8 @@
 package cn.aneureka;
 
 import cn.aneureka.model.WorkflowNet;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 /**
  * @author Aneureka
@@ -27,8 +24,8 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        String modelFile = "src/main/resources/models/Model3.pnml";
-        String logFile = "src/main/resources/logs/log3.txt";
+        String modelFile = "src/main/resources/models/lyp2.pnml";
+        String logFile = "src/main/resources/logs/log_lyp2.txt";
         Main.getLogOfModel(modelFile, logFile);
     }
 }
