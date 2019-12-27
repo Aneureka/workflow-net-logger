@@ -50,7 +50,6 @@ public class WorkflowNet {
     }
 
     public static void removeEdge(Map<Node, List<Node>> graph, Node source, Node target) {
-//        System.out.println(source.toString() + " " + target.toString());
         if (graph.containsKey(source)) {
             graph.get(source).remove(target);
         }
@@ -102,7 +101,8 @@ public class WorkflowNet {
         List<List<Node>> logs = new ArrayList<>();
         List<Node> curNodes = new ArrayList<>();
         curNodes.add(this.in);
-        getLogOfGraph(this.graph, this.out, curNodes, new HashSet<>(), new ArrayList<>(), logs);
+        Map<Node, Set<Node>> accessibleMap = getAccessibleMap(this.graph);
+        getLogOfGraph(this.graph, this.out, accessibleMap, curNodes, new HashSet<>(), new ArrayList<>(), logs);
         logs = distinct(logs);
         if (logFile == null) {
             printLogs(logs);
@@ -116,12 +116,33 @@ public class WorkflowNet {
         }
     }
 
+    public Map<Node, Set<Node>> getAccessibleMap(Map<Node, List<Node>> graph) {
+        Set<Node> nodeSet = new HashSet<>();
+        for (Map.Entry<Node, List<Node>> entry : graph.entrySet()) {
+            nodeSet.add(entry.getKey());
+            nodeSet.addAll(entry.getValue());
+        }
+        List<Node> nodes = new ArrayList<>(nodeSet);
+        Map<Node, Set<Node>> accessibleMap = new HashMap<>();
+        for (int i = 0; i < nodes.size(); i++) {
+            Set<Node> accessibleNodes = new HashSet<>();
+            for (int j = 0; j < nodes.size(); j++) {
+                if (i == j) continue;
+                if (isAccessible(graph, nodes.get(i), nodes.get(j))) {
+                    accessibleNodes.add(nodes.get(j));
+                }
+            }
+            accessibleMap.put(nodes.get(i), accessibleNodes);
+        }
+        return accessibleMap;
+    }
+
     /**
      * Collects the execution (raw) logs of graph recursively.
      */
-    private static void getLogOfGraph(Map<Node, List<Node>> graph, Node exit, List<Node> curNodes, Set<Node> cycleEntries, List<Node> path, List<List<Node>> res) {
+    private static void getLogOfGraph(Map<Node, List<Node>> graph, Node exit, Map<Node, Set<Node>> accessibleMap, List<Node> curNodes, Set<Node> cycleEntries, List<Node> path, List<List<Node>> res) {
 //        System.out.println(path);
-        curNodes = removeAccessibleNodes(graph, curNodes);
+        curNodes = removeAccessibleNodes(accessibleMap, curNodes);
         for (int i = 0; i < curNodes.size(); i++) {
             Node curNode = curNodes.get(i);
             if (curNode.equals(exit)) {
@@ -138,7 +159,7 @@ public class WorkflowNet {
                 for (Node v : graph.get(curNode)) {
                     if (outDegreeOf(tmpGraph, v) > 0 || v.equals(exit)) {
                         curNodes.add(v);
-                        getLogOfGraph(tmpGraph, exit, curNodes, cycleEntries, path, res);
+                        getLogOfGraph(tmpGraph, exit, accessibleMap, curNodes, cycleEntries, path, res);
                         curNodes.remove(v);
                     }
                 }
@@ -155,7 +176,7 @@ public class WorkflowNet {
                     }
                 }
                 curNodes.addAll(neighbors);
-                getLogOfGraph(tmpGraph, exit, curNodes, tmpEntries, path, res);
+                getLogOfGraph(tmpGraph, exit, accessibleMap, curNodes, tmpEntries, path, res);
                 curNodes.removeAll(neighbors);
                 path.remove(path.size() - 1);
             }
@@ -218,22 +239,15 @@ public class WorkflowNet {
     /**
      * Removes nodes that can be assessed by others and return.
      */
-    private static List<Node> removeAccessibleNodes(Map<Node, List<Node>> graph, List<Node> nodes) {
+    private static List<Node> removeAccessibleNodes(Map<Node, Set<Node>> accessibleMap, List<Node> nodes) {
         List<Node> res = new ArrayList<>();
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i) instanceof Place) {
-                res.add(nodes.get(i));
-                continue;
-            }
-            boolean Accessible = false;
-            for (int j = 0; j < nodes.size(); j++) {
-                if (i != j && isAccessible(graph, nodes.get(j), nodes.get(i))) {
-                    Accessible = true;
-                    break;
-                }
-            }
-            if (!Accessible) {
-                res.add(nodes.get(i));
+        Set<Node> accessibleNodes = new HashSet<>();
+        for (Node node : nodes) {
+            accessibleNodes.addAll(accessibleMap.getOrDefault(node, new HashSet<>()));
+        }
+        for (Node node : nodes) {
+            if (!accessibleNodes.contains(node) ) {
+                res.add(node);
             }
         }
         return res;
