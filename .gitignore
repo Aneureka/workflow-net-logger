@@ -17,3 +17,5 @@ buildNumber.properties
 # mac os
 .DS_Store
 
+# logs
+src/main/resources/logs

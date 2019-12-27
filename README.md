@@ -7,9 +7,9 @@
 
 **〈要求〉** 生成输入的业务过程模型包含的所有可能的任务执行序列，其中循环任务执行不超过1次。提交算法源代码，实现接口getLogOfModel(String modelFile, String logFile)。
 
-**〈输入〉**Workflow-net表示的业务过程模型（Business Process Model），XML格式
+**〈输入〉** Workflow-net表示的业务过程模型（Business Process Model），XML格式
 
-**〈输出〉**过程日志文件
+**〈输出〉** 过程日志文件
 
 
 
